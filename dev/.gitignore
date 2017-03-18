@@ -1,4 +1,4 @@
-# Ignore everything Except for some directories:
+# Ignore everything except for some directories:
 *
 !.gitignore
 !dist

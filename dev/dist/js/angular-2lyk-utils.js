@@ -1,5 +1,15 @@
+/**
+* @ngdoc module
+* @module 2lykUtils
+* @description A bunch of utils for AngularJS 1
+*/
 angular.module('2lykUtils', []);
 
+/**
+ * @ngdoc factory
+ * @name 2lykUtils.lykConsole
+ * @description Service to display messages in console
+ */
 angular.module('2lykUtils')
 	.factory('lykConsole', function($log){
 
@@ -22,6 +32,13 @@ angular.module('2lykUtils')
 			debug: debug
 		}
 
+		/**
+   * @memberof 2lykUtils.lykConsole
+   * @function call
+   * @description Display message in console.
+   * @param {string} state - log, info, warn, error or debug.
+	 * @param {mixed} ... values
+   */
 		function call(){
 			var state = arguments[0];
 			if(angular.isString(state) && statesFn[state]){
@@ -33,6 +50,15 @@ angular.module('2lykUtils')
 			return statesFn[state].apply(this, arguments);
 		}
 
+	/**
+   * @memberof 2lykUtils.lykConsole
+   * @function trigger
+   * @description Display message in console if a condition is true.
+   * @param {string} state - log, info, warn, error or debug.
+	 * @param {boolean} condition
+	 * @param {mixed} ... values
+	 * @returns {boolean} true if condition is.
+   */
 		function trigger(){
 			if(arguments.length < 2){
 				return;
@@ -47,22 +73,56 @@ angular.module('2lykUtils')
 			return false;
 		}
 
+		/**
+	   * @memberof 2lykUtils.lykConsole
+	   * @function log
+	   * @description Display log in console.
+		 * @param {mixed} ... values
+	   */
 		function log(){
 			//Array.prototype.push.call(arguments, "[lykConsole]");
 			$log.log.apply(this, arguments);
 		}
+
+		/**
+	   * @memberof 2lykUtils.lykConsole
+	   * @function info
+	   * @description Display info in console.
+		 * @param {mixed} ... values
+	   */
 		function info(){
 			//Array.prototype.push.call(arguments, "[lykConsole]");
 			$log.info.apply(this, arguments);
 		}
+
+		/**
+	   * @memberof 2lykUtils.lykConsole
+	   * @function warn
+	   * @description Display warning in console.
+		 * @param {mixed} ... values
+	   */
 		function warn(){
 			//Array.prototype.push.call(arguments, "[lykConsole]");
 			$log.warn.apply(this, arguments);
 		}
+
+		/**
+	   * @memberof 2lykUtils.lykConsole
+	   * @function error
+	   * @description Display error in console.
+		 * @param {mixed} ... values
+	   */
 		function error(){
 			//Array.prototype.push.call(arguments, "[lykConsole]");
 			$log.error.apply(this, arguments);
 		}
+
+		/**
+	   * @memberof 2lykUtils.lykConsole
+	   * @function debug
+	   * @description Display debug in console.
+		 * @param {mixed} ... values
+	   */
 		function debug(){
 			//Array.prototype.push.call(arguments, "[lykConsole]");
 			$log.debug.apply(this, arguments);
@@ -72,14 +132,40 @@ angular.module('2lykUtils')
 
 });
 
-
+ /**
+ * @ngdoc provider
+ * @name 2lykUtils.lykXhrProvider
+ * @description
+ *  configuration for service lykXhr
+ */
 angular.module('2lykUtils')
 	.provider('lykXhr', function LykXhrProvider() {
   var __apis = {};
 
-  this.routes = function(value) {
-		if(value && angular.isObject(value)){
-			__apis = value;
+		/**
+     * @memberof 2lykUtils.lykXhrProvider
+     * @function routes
+		 * @description
+		 *   Register a collection of routes. The collection is an object with keys as route names and values as configs (see https://docs.angularjs.org/api/ng/service/$http for config)
+     * @param {object} collection - key: {string}, value: {object}
+     * @example
+     *  app.config(function(lykXhrProvider) {
+     *    lykXhrProvider.routes({
+     *      "products:list": {
+     *        url: "http://api.monsite.com/products",
+		 *        method: "GET"
+     *      },
+		 *      "products:get": {
+     *        url: "http://api.monsite.com/products/{id}",
+		 *        method: "GET"
+     *      },
+		 *      ...
+     *    });
+     *  });
+     */
+  this.routes = function(collection) {
+		if(collection && angular.isObject(collection)){
+			__apis = collection;
 			Object.keys(__apis).forEach(
 				function(key) {
 					if(key == "__apis") return delete __apis[key];
@@ -91,6 +177,12 @@ angular.module('2lykUtils')
 		}
   };
 
+	/**
+	* @ngdoc factory
+	* @name 2lykUtils.lykXhr
+	* @description
+	*  Service to quickly make http requests
+	*/
   this.$get = ["$q", "$http", "lykConsole", function lykXhrFactory($q, $http, lykConsole) {
 
 		var utils = {
@@ -141,6 +233,14 @@ angular.module('2lykUtils')
 			return lykConsole.trigger.apply(this, arguments);
 		}
 
+		/**
+     * @memberof 2lykUtils.lykXhr
+     * @function get
+		 * @description
+		 *   Get route config from registered collection
+     * @param {string} name - route name
+		 * @return {object} route configuration
+     */
 		var get = function getConfig(key){
 			if(key == "__apis"){
 				return getAll();
@@ -148,10 +248,49 @@ angular.module('2lykUtils')
 			return angular.copy(__apis[key]);
 		}
 
+		/**
+     * @memberof 2lykUtils.lykXhr
+     * @function getAll
+		 * @description
+		 *   Get registered collection
+		 * @return {object} collection
+     */
 		var getAll = function getAllConfig(){
 				return angular.copy(__apis);
 		}
 
+		/**
+     * @memberof 2lykUtils.lykXhr
+     * @function execute
+		 * @description
+		 *   Execute a request. The `params` argument allow us to change elements in the url to use.
+		 *   For example, if the url in your collection's route config is like `http://api.monsite.com/products/{id}`,
+		 *   you want to replace `{id}` by the product's id when you make the request (example: `A1234`).
+		 *   You can do so by sending `{id: "A1234"}` as the `params` argument.
+		 * @param {string} name - route name
+		 * @param {object} config - add more config (see $http(config))
+		 * @param {object} params - replace elements in url with another value
+		 * @example
+		 *  app.config(function(lykXhrProvider) {
+     *    lykXhrProvider.routes({
+		 *      ...
+		 *      "products:get": {
+     *        url: "http://api.monsite.com/products/{id}",
+		 *        method: "GET"
+     *      },
+		 *      ...
+     *    });
+     *  });
+		 *  app.controller("ProductDetailsCtrl",function($scope, lykConsole, lykXhr) {
+		 *    $scope.item = {};
+     *    lykXhr.execute("products:get", null, {id: "A1234"})
+		 *      .then(
+		 *        item => {$scope.item = item},
+		 *        e => lykConsole.error(e.status)
+	   *      );
+     *  });
+		 * @return {object} promise
+     */
 		var execute = function execute(apiName, customConfig, params){
 			customConfig = customConfig || {};
 			params = params || {};
@@ -193,6 +332,15 @@ angular.module('2lykUtils')
 			return dfd.promise;
 		}
 
+		/**
+     * @memberof 2lykUtils.lykXhr
+     * @function set
+		 * @description
+		 *   Register a new route or change the config of an already registered route in the collection.
+     * @param {string} name - route name
+		 * @param {object} config - config
+		 * @return {object} this
+     */
 		var set = function set(key, value){
 			if(errorHandler(!angular.isString(key), '[set]', 'Argument 1 must be a string.', 'Instead, received: '+ (typeof key)))
 				return;

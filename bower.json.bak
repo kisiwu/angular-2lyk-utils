@@ -1,0 +1,25 @@
+{
+  "name": "angular-2lyk-utils",
+  "description": "A bunch of utils for AngularJS 1",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "bin",
+    "dev"
+  ],
+  "keywords": [
+    "angular",
+    "utils",
+    "2lyk"
+  ],
+  "authors": [
+    "sbolingo <sbolingo@outlook.com>",
+    "demingongo"
+  ],
+  "dependencies": {
+    "angular": "1.6.x",
+    "jquery": "^3.1.1",
+    "materialize": "^0.98.0"
+  }
+}

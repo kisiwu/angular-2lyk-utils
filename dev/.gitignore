@@ -1,0 +1,9 @@
+# Ignore everything:
+*
+!.gitignore
+
+# Except for some directories:
+
+!dist/*
+!dist/js
+!dist/js/*

@@ -185,6 +185,12 @@ angular.module('2lykUtils')
 	*/
   this.$get = ["$q", "$http", "lykConsole", function lykXhrFactory($q, $http, lykConsole) {
 
+		function errorHandler(){
+			Array.prototype.splice.call(arguments, 1, 0, "[lykXhr] >");
+			Array.prototype.unshift.call(arguments, "error");
+			return lykConsole.trigger.apply(this, arguments);
+		}
+
 		/**
      * @memberof 2lykUtils.lykXhr
      * @function get
@@ -273,9 +279,9 @@ angular.module('2lykUtils')
 			}
 			else{
 				var proposals = Object.keys(__apis)
-					.filter(function(key){key.indexOf(apiName) != -1});
+					.filter(function(key){return key.indexOf(apiName) != -1});
 				var errMessage = '"'+apiName+'" is undefined. ';
-				if(!errorHandler(proposals.length > 0 ,'[execute]', errMessage+'Did you mean:', proposals.toString(), '?')){
+				if(!errorHandler(proposals.length > 0 ,'[execute]', errMessage+'Did you mean:', proposals.join(', '), '?')){
 					errorHandler(true, '[execute]', errMessage);
 				}
 
@@ -321,7 +327,6 @@ angular.module('2lykUtils')
 /**
  * @ngdoc factory
  * @name 2lykUtils.JoiSchemaUtils
- * @description Service utility with Joi validation objects
  */
 angular.module('2lykUtils')
 	.factory('JoiSchemaUtils', function(lykConsole){
@@ -334,6 +339,12 @@ angular.module('2lykUtils')
 			isRequired: isRequired
 		};
 
+		function errorHandler(){
+			Array.prototype.splice.call(arguments, 1, 0, "[JoiSchemaUtils] >");
+			Array.prototype.unshift.call(arguments, "error");
+			return lykConsole.trigger.apply(this, arguments);
+		}
+
 		function validUtilsArgs(objectSchema, key, methodName){
 			if(errorHandler(!angular.isString(key), methodName,'Argument 2 must be a string.', 'Instead, received: '+ (typeof key)))
 				return;
@@ -343,37 +354,65 @@ angular.module('2lykUtils')
 			return true;
 		}
 
+		/**
+     * @memberof 2lykUtils.JoiSchemaUtils
+     * @function getValids
+     * @param {object} object
+		 * @param {string} key - key
+		 * @return {Array|undefined} undefined if object[key] is not a Joi schema object
+     */
 		function getValids(objectSchema, key){
 			if(!validUtilsArgs(objectSchema, key, '[getValids]')) return;
 			return objectSchema[key]._valids._set;
 		}
 
+		/**
+     * @memberof 2lykUtils.JoiSchemaUtils
+     * @function getInvalids
+     * @param {object} object
+		 * @param {string} key - key
+		 * @return {Array|undefined} undefined if object[key] is not a Joi schema object
+     */
 		function getInvalids(objectSchema, key){
 			if(!validUtilsArgs(objectSchema, key, '[getInvalids]')) return;
 			return objectSchema[key]._invalids._set;
 		}
 
+		/**
+     * @memberof 2lykUtils.JoiSchemaUtils
+     * @function getUnit
+     * @param {object} object
+		 * @param {string} key - key
+		 * @return {string|undefined} undefined if object[key] is not a Joi schema object
+     */
 		function getUnit(objectSchema, key){
 			if(!validUtilsArgs(objectSchema, key, '[getUnit]')) return;
 			return objectSchema[key]._unit;
 		}
 
+		/**
+     * @memberof 2lykUtils.JoiSchemaUtils
+     * @function getType
+     * @param {object} object
+		 * @param {string} key - key
+		 * @return {string|undefined} undefined if object[key] is not a Joi schema object
+     */
 		function getType(objectSchema, key){
 			if(!validUtilsArgs(objectSchema, key, '[getType]')) return;
 			return objectSchema[key]._type;
 		}
 
+		/**
+     * @memberof 2lykUtils.JoiSchemaUtils
+     * @function isRequired
+     * @param {object} object
+		 * @param {string} key - key
+		 * @return {boolean|undefined} undefined if object[key] is not a Joi schema object
+     */
 		function isRequired(objectSchema, key){
 			if(!validUtilsArgs(objectSchema, key, '[isRequired]')) return;
 			return objectSchema[key]._flags.presence == "required";
 		}
 
-		function errorHandler(){
-			Array.prototype.splice.call(arguments, 1, 0, "[JoiSchemaUtils] >");
-			Array.prototype.unshift.call(arguments, "error");
-			return lykConsole.trigger.apply(this, arguments);
-		}
-
 		return newInstance;
-
 });

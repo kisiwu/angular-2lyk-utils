@@ -1,9 +1,11 @@
-# Ignore everything:
+# Ignore everything Except for some directories:
 *
 !.gitignore
-
-# Except for some directories:
-
-!dist/*
+!dist
+!dist/
 !dist/js
 !dist/js/*
+!dist/css
+!dist/css/*
+!dist/fonts
+!dist/fonts/*

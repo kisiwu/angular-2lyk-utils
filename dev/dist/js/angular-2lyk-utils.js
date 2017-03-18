@@ -185,54 +185,6 @@ angular.module('2lykUtils')
 	*/
   this.$get = ["$q", "$http", "lykConsole", function lykXhrFactory($q, $http, lykConsole) {
 
-		var utils = {
-			getType: getType,
-			getValids: getValids,
-			getInvalids: getInvalids,
-			getUnit: getUnit,
-			isRequired: isRequired
-		}
-
-		function validUtilsArgs(objectSchema, key){
-			if(errorHandler(!angular.isString(key), '[isRequired]','Argument 2 must be a string.', 'Instead, received: '+ (typeof key)))
-				return;
-			if(!objectSchema || !angular.isObject(objectSchema)) return;
-			if(!angular.isObject(objectSchema[key])) return;
-			if(!objectSchema[key].isJoi) return;
-			return true;
-		}
-
-		function getValids(objectSchema, key){
-			if(!validUtilsArgs(objectSchema, key)) return;
-			return objectSchema[key]._valids._set;
-		}
-
-		function getInvalids(objectSchema, key){
-			if(!validUtilsArgs(objectSchema, key)) return;
-			return objectSchema[key]._invalids._set;
-		}
-
-		function getUnit(objectSchema, key){
-			if(!validUtilsArgs(objectSchema, key)) return;
-			return objectSchema[key]._unit;
-		}
-
-		function getType(objectSchema, key){
-			if(!validUtilsArgs(objectSchema, key)) return;
-			return objectSchema[key]._type;
-		}
-
-		function isRequired(objectSchema, key){
-			if(!validUtilsArgs(objectSchema, key)) return;
-			return objectSchema[key]._flags.presence == "required";
-		}
-
-		function errorHandler(){
-			Array.prototype.splice.call(arguments, 1, 0, "[lykXhr] >");
-			Array.prototype.unshift.call(arguments, "error");
-			return lykConsole.trigger.apply(this, arguments);
-		}
-
 		/**
      * @memberof 2lykUtils.lykXhr
      * @function get
@@ -359,9 +311,69 @@ angular.module('2lykUtils')
 			getAll: getAll,
 			set: set,
 
-			execute: execute,
-
-			utils: utils
+			execute: execute
 		}
   }];
+});
+
+
+
+/**
+ * @ngdoc factory
+ * @name 2lykUtils.JoiSchemaUtils
+ * @description Service utility with Joi validation objects
+ */
+angular.module('2lykUtils')
+	.factory('JoiSchemaUtils', function(lykConsole){
+
+		var newInstance = {
+			getValids: getValids,
+			getInvalids: getInvalids,
+			getUnit: getUnit,
+			getType: getType,
+			isRequired: isRequired
+		};
+
+		function validUtilsArgs(objectSchema, key, methodName){
+			if(errorHandler(!angular.isString(key), methodName,'Argument 2 must be a string.', 'Instead, received: '+ (typeof key)))
+				return;
+			if(!objectSchema || !angular.isObject(objectSchema)) return;
+			if(!angular.isObject(objectSchema[key])) return;
+			if(!objectSchema[key].isJoi) return;
+			return true;
+		}
+
+		function getValids(objectSchema, key){
+			if(!validUtilsArgs(objectSchema, key, '[getValids]')) return;
+			return objectSchema[key]._valids._set;
+		}
+
+		function getInvalids(objectSchema, key){
+			if(!validUtilsArgs(objectSchema, key, '[getInvalids]')) return;
+			return objectSchema[key]._invalids._set;
+		}
+
+		function getUnit(objectSchema, key){
+			if(!validUtilsArgs(objectSchema, key, '[getUnit]')) return;
+			return objectSchema[key]._unit;
+		}
+
+		function getType(objectSchema, key){
+			if(!validUtilsArgs(objectSchema, key, '[getType]')) return;
+			return objectSchema[key]._type;
+		}
+
+		function isRequired(objectSchema, key){
+			if(!validUtilsArgs(objectSchema, key, '[isRequired]')) return;
+			return objectSchema[key]._flags.presence == "required";
+		}
+
+		function errorHandler(){
+			Array.prototype.splice.call(arguments, 1, 0, "[JoiSchemaUtils] >");
+			Array.prototype.unshift.call(arguments, "error");
+			return lykConsole.trigger.apply(this, arguments);
+		}
+
+		return newInstance;
+
 });

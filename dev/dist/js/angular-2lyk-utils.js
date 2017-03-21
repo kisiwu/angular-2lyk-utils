@@ -416,3 +416,134 @@ angular.module('2lykUtils')
 
 		return newInstance;
 });
+
+
+/**
+ * @ngdoc factory
+ * @name 2lykUtils.lykPropertyAccess
+ * @description Service to access properties
+ */
+angular.module('2lykUtils')
+	.factory('lykPropertyAccess', function(lykConsole, $q){
+
+		var newInstance = {
+			split: split,
+
+			isReadable: isReadable,
+			getValue: getValue,
+			setValue: setValue,
+			getType: getType,
+
+			async: {
+				getValue: getValueAsync,
+				setValue: setValueAsync,
+				getType: getTypeAsync,
+			}
+		}
+
+		var asnc = {
+
+		}
+
+		function errorHandler(){
+			Array.prototype.splice.call(arguments, 1, 0, "[lykPropertyAccess] >");
+			Array.prototype.unshift.call(arguments, "error");
+			return lykConsole.trigger.apply(this, arguments);
+		}
+
+		function validUtilsArgs(token, object, expression){
+			if(errorHandler(!angular.isObject(object) && !angular.isArray(object), token, 'Argument 1 must be an object or an array.', 'Instead, received: '+ (typeof object)))
+				return;
+			if(errorHandler(!angular.isString(expression), token, 'Argument 2 must be a string.', 'Instead, received: '+ (typeof expression)))
+				return;
+
+			return true;
+		}
+
+		function getTypeAsync(object, expression){
+			return __doAsync(getType, object, expression);
+		}
+
+		function getValueAsync(object, expression){
+			return __doAsync(getValue, object, expression);
+		}
+
+		function setValueAsync(object, expression, newValue){
+			return __doAsync(setValue, object, expression, newValue);
+		}
+
+		function getType(object, expression){
+			var value = getValue(object, expression);
+			var retour = "";
+			if( Object.prototype.toString.call( value ) === '[object Array]' ) {
+				retour = 'array';
+			}
+			else{
+				retour = typeof value;
+			}
+			return retour;
+		}
+
+		function getValue(object, expression){
+			if(!validUtilsArgs("[getValue]", object, expression))
+				return;
+			return __access(object, expression).value;
+		}
+
+		function setValue(object, expression, newValue){
+			if(!validUtilsArgs("[setValue]", object, expression))
+				return;
+			var accessReturn = __access(object, expression);
+			if(accessReturn.isReadable){
+				accessReturn.previous[accessReturn.lastKey] = newValue;
+			}
+			return;
+		}
+
+		function isReadable(object, expression){
+			if(!validUtilsArgs("[isReadable]", object, expression))
+				return;
+			return __access(object, expression).isReadable;
+		}
+
+		function __access(object, expression){
+			var mapping = split(expression);
+			var value = object;
+			var previous = value;
+			var lastKey;
+			var i = 0;
+			while(i < mapping.length){
+				var key = mapping[i];
+				lastKey = key;
+				previous = value;
+				value = value[key];
+				if((!value || !angular.isObject(value)) && i < mapping.length-1)
+					break;
+				i++;
+			}
+			var isReadable = i >= mapping.length;
+			return {isReadable: isReadable, value: value, data: object, previous: previous, lastKey: lastKey};
+		}
+
+		function __doAsync(fn, object, expression, other){
+			return $q(function(res, rej){
+				var data = fn(object, expression, other);
+				return res(data);
+			});
+		}
+
+		function split(expression){
+			expression = expression.trim();
+			if(expression.indexOf('.') > -1){
+				return expression.split('.');
+			}
+			if(expression.startsWith("[") && expression.endsWith("]")){
+				expression = expression.substring(1, expression.length-1);
+				return expression.split(/[\[\]]+/);
+			}
+			return expression;
+		}
+
+		return newInstance;
+
+});

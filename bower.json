@@ -3,7 +3,7 @@
   "description": "A bunch of utils for AngularJS 1",
   "version": "0.0.1",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "ignore": [
     "bin",
     "dev"

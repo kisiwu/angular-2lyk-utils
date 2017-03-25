@@ -484,12 +484,26 @@ angular.module('2lykUtils')
 			return retour;
 		}
 
+		/**
+     * @memberof 2lykUtils.lykPropertyAccess
+     * @function getValue
+     * @param {object} object
+		 * @param {string} propertyPath
+		 * @return {mixed} value
+     */
 		function getValue(object, expression){
 			if(!validUtilsArgs("[getValue]", object, expression))
 				return;
 			return __access(object, expression).value;
 		}
 
+		/**
+     * @memberof 2lykUtils.lykPropertyAccess
+     * @function setValue
+     * @param {object} object
+		 * @param {string} propertyPath
+		 * @param {mixed} newValue
+     */
 		function setValue(object, expression, newValue){
 			if(!validUtilsArgs("[setValue]", object, expression))
 				return;
@@ -500,6 +514,13 @@ angular.module('2lykUtils')
 			return;
 		}
 
+		/**
+     * @memberof 2lykUtils.lykPropertyAccess
+     * @function isReadable
+     * @param {object} object
+		 * @param {string} propertyPath
+		 * @return {boolean}
+     */
 		function isReadable(object, expression){
 			if(!validUtilsArgs("[isReadable]", object, expression))
 				return;
@@ -541,7 +562,7 @@ angular.module('2lykUtils')
 				expression = expression.substring(1, expression.length-1);
 				return expression.split(/[\[\]]+/);
 			}
-			return expression;
+			return expression.split('.');
 		}
 
 		return newInstance;

@@ -53,7 +53,13 @@ module.exports = function(grunt) {
     },
     app: {
         files: {
-            './dev/min-safe/js/angular-2lyk-utils.js': ['./dev/dist/js/angular-2lyk-utils.js']
+            './dev/min-safe/js/angular-2lyk-utils.js': ['./dev/dist/js/angular-2lyk-utils.js'],
+            './dev/min-safe/directives/angular-2lyk-directives.js': [
+              './dev/dist/js/directives/lyk-ng-repeat-listen-to.directive.js',
+              './dev/dist/js/directives/lyk-on-bottom.directive.js',
+              './dev/dist/js/directives/lyk-stick.directive.js',
+              './dev/dist/js/directives/lyk-list.directive.js'
+            ]
         }
     }
   },
@@ -62,6 +68,10 @@ module.exports = function(grunt) {
     js: { //target
         src: ['./dev/min-safe/js/*.js'],
         dest: './dev/min/angular-2lyk-utils.js'
+    },
+    directives: { //target
+        src: ['./dev/min-safe/directives/*.js'],
+        dest: './dev/min/angular-2lyk-directives.js'
     }
   },
 
@@ -69,6 +79,10 @@ module.exports = function(grunt) {
     js: { //target
         src: ['./dev/min/angular-2lyk-utils.js'],
         dest: './dist/js/angular-2lyk-utils.min.js'
+    },
+    directives: { //target
+        src: ['./dev/min/angular-2lyk-directives.js'],
+        dest: './dist/js/angular-2lyk-directives.min.js'
     }
   }
 

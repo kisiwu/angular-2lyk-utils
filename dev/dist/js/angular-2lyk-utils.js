@@ -191,6 +191,29 @@ angular.module('2lykUtils')
 			return lykConsole.trigger.apply(this, arguments);
 		}
 
+		function buildConfig(apiName, customConfig, params){
+			customConfig = customConfig || {};
+			params = params || {};
+			var api = __apis[apiName];
+			var config = {
+				method: api.method,
+				url: api.url
+			};
+			Object.keys(params).forEach(
+				function(key){
+					var re = new RegExp( '{'+key+'}', 'g');
+					config.url = config.url.replace(re, params[key]);
+				}
+			);
+			Object.keys(customConfig).forEach(
+				function(key){
+					if(key.toLowerCase() != 'method' && key.toLowerCase() != 'url')
+						config[key] = customConfig[key];
+				}
+			);
+			return config;
+		}
+
 		/**
      * @memberof 2lykUtils.lykXhr
      * @function get
@@ -250,29 +273,9 @@ angular.module('2lykUtils')
 		 * @return {object} promise
      */
 		var execute = function execute(apiName, customConfig, params){
-			customConfig = customConfig || {};
-			params = params || {};
-
 			var dfd = $q.defer();
 			if(__apis[apiName]){
-				var api = __apis[apiName];
-				var config = {
-					method: api.method,
-					url: api.url
-				};
-				Object.keys(params).forEach(
-					function(key){
-						var re = new RegExp( '{'+key+'}', 'g');
-						config.url = config.url.replace(re, params[key]);
-					}
-				);
-				Object.keys(customConfig).forEach(
-					function(key){
-						if(key.toLowerCase() != 'method' && key.toLowerCase() != 'url')
-							config[key] = customConfig[key];
-					}
-				);
-				$http(config).then(
+				$http(buildConfig(apiName, customConfig, params)).then(
 					function(r){dfd.resolve(r.data)},
 					function(e){dfd.reject(e)}
 				);
@@ -317,7 +320,9 @@ angular.module('2lykUtils')
 			getAll: getAll,
 			set: set,
 
-			execute: execute
+			execute: execute,
+
+			buildConfig: buildConfig
 		}
   }];
 });
@@ -566,5 +571,186 @@ angular.module('2lykUtils')
 		}
 
 		return newInstance;
+});
+
+/**
+ * @ngdoc factory
+ * @name 2lykUtils.lykTmpFiles
+ * @description Keep files temporarily
+ */
+angular.module('2lykUtils')
+.factory("lykTmp", function(lykXhr, $http, $q, $interval){
+
+	var newInstance = {
+		get: get
+	};
+
+	/**
+   * Keep responses in the service so we don't call the API
+   * every time.
+   */
+   var responses = {};
+
+	 var defaultTLD = "[tmp]";
+
+	 function cleanAll(){
+	 }
+
+	 /**
+	 * @param {object} ncp - {name: '...', config: {...}, params: {...}} (see lykXhr.execute)
+	 * @param {string} tld - top-level domain
+	 * @returns {boolean} bool - true if response saved
+	 */
+	 function isSaved(ncp, tldName){
+
+	 }
+
+	 /**
+	 * @param {object} ncp - {name: '...', config: {...}, params: {...}} (see lykXhr.execute)
+	 * @param {string} tld - top-level domain
+	 * @returns {object} promise
+	 */
+	 function force(ncp, tldName){
+	 }
+
+	 /**
+	 * @param {object} ncp - {name: '...', config: {...}, params: {...}} (see lykXhr.execute)
+	 * @param {string} tld - top-level domain
+	 * @returns {object} promise
+	 */
+	 function get(ncp, tldName){
+		 return $q(function(res, rej){
+			 tldName = tldName || defaultTLD;
+			 var config = lykXhr.buildConfig(ncp.name, ncp.config, ncp.params);
+			 var tld = responses[tldName];
+			 var domainName = config.method ? config.method.toUpperCase() : "GET";
+			 var responseName = config.url;
+			 var domain;
+       if(tld && tld[domainName] && tld[domainName][responseName]){
+				 domain = tld[domainName];
+				 var response = domain[responseName];
+         if(!response.value || (response.value && response.value.$$state.status == 2) ){
+					 console.warn("another try to retrieve");
+           if(response.try < 3){
+             response.try++;
+           }
+           else{
+             return rej(response);
+           }
+         }
+         else{
+           if(response.expiredAt && response.expiredAt.getTime() > (new Date()).getTime()){
+						 console.warn("get from tmp:", tldName, response);
+             return __doWaitAndRespond(response.value, res, rej);
+           }
+         }
+       }
+			 else{
+				 if(!tld){
+					 responses[tldName] = {};
+					 tld = responses[tldName];
+				 }
+				 if(!tld[domainName]){
+					 tld[domainName] = {};
+				 }
+				 domain = tld[domainName];
+			 }
+			 var nd = new Date();
+			 nd.setSeconds(nd.getSeconds() + 5 + 60);
+			 if(!domain[responseName]){
+				 domain[responseName] = {
+					 try: 1
+				 };
+			 }
+			 domain[responseName].expiredAt = nd;
+       domain[responseName].value = $http(config).then(
+         function(r){
+					 console.debug("from API");
+           /*domain[responseName].value = r;
+           res(domain[responseName].value);*/
+					 return r;
+         },
+         function(e){
+           //rej(e);
+					 return e;
+         }
+       );
+
+			 __doWaitAndRespond(domain[responseName].value, res, rej);
+
+			 /*var notified = false;
+			 var i = total = 50;
+
+			 var interval = $interval(function(){
+				 if(domain[responseName].value.$$state.status == 0){
+					 console.debug("interval", i);
+				 }
+				 console.log(i);
+				 if(domain[responseName].value.$$state.status != 0 && !notified){
+					 notified = true;
+					 var resp = domain[responseName].value.$$state.value;
+					 cancelInterval(i, total);
+					 if(domain[responseName].value.$$state.status == 2){
+						 return rej(resp);
+					 }
+					 else{
+						 return res(resp);
+					 }
+				 }
+				 i--;
+				 if(i <= 0){
+					 cancelInterval(i, total);
+					 console.error("There has been a problem with the service lykTmp", resp);
+					 return rej();
+				 }
+
+			 }, 500, total);
+
+			 function cancelInterval(){
+				 console.debug("cancel interval", arguments);
+				 $interval.cancel(interval);
+			 }*/
+
+			 //return res(domain[responseName].value.$$state);
+	 		}
+		);
+	}
+
+	function __doWaitAndRespond(promise, resolve, reject){
+		var notified = false;
+		var i = total = 50;
+
+		var interval = $interval(function(){
+			if(promise.$$state.status == 0){
+				console.debug("interval", i);
+			}
+			console.log(i);
+			if(promise.$$state.status != 0 && !notified){
+				notified = true;
+				var resp = promise.$$state.value;
+				cancelInterval(i, total);
+				if(promise.$$state.status == 2){
+					return reject(resp);
+				}
+				else{
+					return resolve(resp);
+				}
+			}
+			i--;
+			if(i <= 0){
+				cancelInterval(i, total);
+				console.error("There has been a problem with the service lykTmp", resp);
+				return reject();
+			}
+
+		}, 500, total);
+
+		function cancelInterval(){
+			console.debug("cancel interval", arguments);
+			$interval.cancel(interval);
+		}
+	}
+
+	 return newInstance;
 
 });

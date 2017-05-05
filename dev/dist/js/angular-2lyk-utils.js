@@ -3,7 +3,7 @@
 * @module 2lykUtils
 * @description A bunch of utils for AngularJS 1
 */
-angular.module('2lykUtils', []);
+angular.module('2lykUtils', ['ngStorage']);
 
 /**
  * @ngdoc factory
@@ -579,7 +579,7 @@ angular.module('2lykUtils')
  * @description Keep files temporarily
  */
 angular.module('2lykUtils')
-.factory("lykTmp", function(lykXhr, $http, $q, $interval){
+.factory("lykTmp", function(lykXhr, $http, $q, $interval, $sessionStorage){
 
 	var newInstance = {
 		get: get
@@ -618,11 +618,17 @@ angular.module('2lykUtils')
 	 * @param {string} tld - top-level domain
 	 * @returns {object} promise
 	 */
-	 function get(ncp, tldName){
+	 function get(ncp, tldName, toSessionStorage){
 		 return $q(function(res, rej){
 			 tldName = tldName || defaultTLD;
 			 var config = lykXhr.buildConfig(ncp.name, ncp.config, ncp.params);
-			 var tld = responses[tldName];
+			 var tld;
+			 if(toSessionStorage){
+				 tld = $sessionStorage[tldName];
+			 }
+			 else{
+				 tld = responses[tldName];
+			 }
 			 var domainName = config.method ? config.method.toUpperCase() : "GET";
 			 var responseName = config.url;
 			 var domain;
@@ -647,8 +653,14 @@ angular.module('2lykUtils')
        }
 			 else{
 				 if(!tld){
-					 responses[tldName] = {};
-					 tld = responses[tldName];
+					 if(toSessionStorage){
+						 $sessionStorage[tldName] = {};
+						 tld = $sessionStorage[tldName];
+					 }
+					 else{
+						 responses[tldName] = {};
+						 tld = responses[tldName];
+					 }
 				 }
 				 if(!tld[domainName]){
 					 tld[domainName] = {};
@@ -665,7 +677,7 @@ angular.module('2lykUtils')
 			 domain[responseName].expiredAt = nd;
        domain[responseName].value = $http(config).then(
          function(r){
-					 console.debug("from API");
+					 //console.debug("from API");
            /*domain[responseName].value = r;
            res(domain[responseName].value);*/
 					 return r;
@@ -676,42 +688,7 @@ angular.module('2lykUtils')
          }
        );
 
-			 __doWaitAndRespond(domain[responseName].value, res, rej);
-
-			 /*var notified = false;
-			 var i = total = 50;
-
-			 var interval = $interval(function(){
-				 if(domain[responseName].value.$$state.status == 0){
-					 console.debug("interval", i);
-				 }
-				 console.log(i);
-				 if(domain[responseName].value.$$state.status != 0 && !notified){
-					 notified = true;
-					 var resp = domain[responseName].value.$$state.value;
-					 cancelInterval(i, total);
-					 if(domain[responseName].value.$$state.status == 2){
-						 return rej(resp);
-					 }
-					 else{
-						 return res(resp);
-					 }
-				 }
-				 i--;
-				 if(i <= 0){
-					 cancelInterval(i, total);
-					 console.error("There has been a problem with the service lykTmp", resp);
-					 return rej();
-				 }
-
-			 }, 500, total);
-
-			 function cancelInterval(){
-				 console.debug("cancel interval", arguments);
-				 $interval.cancel(interval);
-			 }*/
-
-			 //return res(domain[responseName].value.$$state);
+			 return __doWaitAndRespond(domain[responseName].value, res, rej);
 	 		}
 		);
 	}
@@ -722,9 +699,9 @@ angular.module('2lykUtils')
 
 		var interval = $interval(function(){
 			if(promise.$$state.status == 0){
-				console.debug("interval", i);
+				//console.debug("interval", i);
 			}
-			console.log(i);
+			//console.log(i);
 			if(promise.$$state.status != 0 && !notified){
 				notified = true;
 				var resp = promise.$$state.value;
@@ -746,7 +723,7 @@ angular.module('2lykUtils')
 		}, 500, total);
 
 		function cancelInterval(){
-			console.debug("cancel interval", arguments);
+			//console.debug("cancel interval", arguments);
 			$interval.cancel(interval);
 		}
 	}

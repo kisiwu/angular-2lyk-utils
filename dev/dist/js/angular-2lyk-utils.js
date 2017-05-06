@@ -619,11 +619,15 @@ angular.module('2lykUtils')
 	 * @returns {object} promise
 	 */
 	 function get(ncp, tldName, toSessionStorage){
+		 if(angular.isString(ncp)){
+			 ncp = {name: ncp};
+		 }
 		 return $q(function(res, rej){
 			 tldName = tldName || defaultTLD;
 			 var config = lykXhr.buildConfig(ncp.name, ncp.config, ncp.params);
 			 var tld;
 			 if(toSessionStorage){
+				 //console.error("TO SESSION STORAGE");
 				 tld = $sessionStorage[tldName];
 			 }
 			 else{
@@ -635,7 +639,7 @@ angular.module('2lykUtils')
        if(tld && tld[domainName] && tld[domainName][responseName]){
 				 domain = tld[domainName];
 				 var response = domain[responseName];
-         if(!response.value || (response.value && response.value.$$state.status == 2) ){
+         if(!response.value || (response.value && response.value.$$state && response.value.$$state.status == 2) ){
 					 console.warn("another try to retrieve");
            if(response.try < 3){
              response.try++;
@@ -645,8 +649,13 @@ angular.module('2lykUtils')
            }
          }
          else{
-           if(response.expiredAt && response.expiredAt.getTime() > (new Date()).getTime()){
+           if(response.expiredAt && (new Date(response.expiredAt)).getTime() > (new Date()).getTime()){
 						 console.warn("get from tmp:", tldName, response);
+						 //because Non-JSON objects (e.g.: promise, Blob, File, etc) cannot be saved in storage
+						 //attribute 'saved' to get the response saved in storage
+						 if(response.saved && !response.value.$$state){
+							 return res(response.saved);
+						 }
              return __doWaitAndRespond(response.value, res, rej);
            }
          }
@@ -654,6 +663,7 @@ angular.module('2lykUtils')
 			 else{
 				 if(!tld){
 					 if(toSessionStorage){
+						 //console.error("TO SESSION STORAGE");
 						 $sessionStorage[tldName] = {};
 						 tld = $sessionStorage[tldName];
 					 }
@@ -680,6 +690,10 @@ angular.module('2lykUtils')
 					 //console.debug("from API");
            /*domain[responseName].value = r;
            res(domain[responseName].value);*/
+					 if(toSessionStorage){
+						 //console.error("TO SESSION STORAGE");
+						 domain[responseName].saved = r;
+					 }
 					 return r;
          },
          function(e){

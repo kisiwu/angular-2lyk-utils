@@ -543,8 +543,13 @@ angular.module('2lykUtils')
 				lastKey = key;
 				previous = value;
 				value = value[key];
-				if((!value || !angular.isObject(value)) && i < mapping.length-1)
+				if(!angular.isObject(value) && i < mapping.length-1){
+					if(value){
+						previous = value;
+						value = undefined;
+					}
 					break;
+				}
 				i++;
 			}
 			var isReadable = i >= mapping.length;

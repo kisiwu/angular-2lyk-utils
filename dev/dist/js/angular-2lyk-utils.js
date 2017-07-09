@@ -21,7 +21,10 @@ angular.module('2lykUtils')
 			info: info,
 			warn: warn,
 			error: error,
-			debug: debug
+			debug: debug,
+
+			//custom
+			matrix: matrix
 		};
 
 		var statesFn = {
@@ -29,7 +32,8 @@ angular.module('2lykUtils')
 			info: info,
 			warn: warn,
 			error: error,
-			debug: debug
+			debug: debug,
+			matrix: matrix
 		}
 
 		/**
@@ -126,6 +130,27 @@ angular.module('2lykUtils')
 		function debug(){
 			//Array.prototype.push.call(arguments, "[lykConsole]");
 			$log.debug.apply(this, arguments);
+		}
+
+		/**
+	   * @memberof 2lykUtils.lykConsole
+	   * @function matrix
+	   * @description (Google Chrome) Display a string in console. Arguments are stringified if there are not strings.
+		 * @param {string} ... values
+	   */
+		function matrix(){
+			//Array.prototype.push.call(arguments, "[lykConsole]");
+			var concatedArguments = "";
+			for(var i=0; i < arguments.length; i++){
+				if(angular.isString(arguments[i])){
+					concatedArguments += " " + arguments[i];
+					continue;
+				}
+				concatedArguments += " " + JSON.stringify(arguments[i]);
+			}
+			concatedArguments += " ";
+
+			$log.log.apply(this, ["%c"+concatedArguments,"background-color: black; color: #00FF00;"]);
 		}
 
 		return newInstance;
@@ -580,8 +605,8 @@ angular.module('2lykUtils')
 
 /**
  * @ngdoc factory
- * @name 2lykUtils.lykTmpFiles
- * @description Keep files temporarily
+ * @name 2lykUtils.lykTmp
+ * @description Keep data temporarily
  */
 angular.module('2lykUtils')
 .factory("lykTmp", function(lykXhr, $http, $q, $interval, $sessionStorage){
@@ -621,6 +646,7 @@ angular.module('2lykUtils')
 	 /**
 	 * @param {object} ncp - {name: '...', config: {...}, params: {...}} (see lykXhr.execute)
 	 * @param {string} tld - top-level domain
+	 * @param {boolean} toSessionStorage - save it to session storage
 	 * @returns {object} promise
 	 */
 	 function get(ncp, tldName, toSessionStorage){
@@ -717,11 +743,11 @@ angular.module('2lykUtils')
 		var i = total = 50;
 
 		var interval = $interval(function(){
-			if(promise.$$state.status == 0){
+			if(promise.$$state && promise.$$state.status == 0){
 				//console.debug("interval", i);
 			}
 			//console.log(i);
-			if(promise.$$state.status != 0 && !notified){
+			if(promise.$$state && promise.$$state.status != 0 && !notified){
 				notified = true;
 				var resp = promise.$$state.value;
 				cancelInterval(i, total);
@@ -735,8 +761,8 @@ angular.module('2lykUtils')
 			i--;
 			if(i <= 0){
 				cancelInterval(i, total);
-				console.error("There has been a problem with the service lykTmp", resp);
-				return reject();
+				console.error("There has been a problem with the service lykTmp");
+				return reject(promise);
 			}
 
 		}, 500, total);

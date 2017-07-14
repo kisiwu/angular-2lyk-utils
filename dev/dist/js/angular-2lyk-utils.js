@@ -26,7 +26,7 @@ angular.module('2lykUtils')
 
 	 function callDev(cb, args){
 		 if(dev){
-			 Array.prototype.unshift.call(args, "[DEV]");
+			 //Array.prototype.unshift.call(args, "[DEV]");
 			 cb.apply(cb, args);
 		 }
 	 }

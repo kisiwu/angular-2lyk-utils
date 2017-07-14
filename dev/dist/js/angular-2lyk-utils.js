@@ -6,156 +6,188 @@
 angular.module('2lykUtils', ['ngStorage']);
 
 /**
- * @ngdoc factory
- * @name 2lykUtils.lykConsole
- * @description Service to display messages in console
- */
+* @ngdoc provider
+* @name 2lykUtils.lykConsoleProvider
+* @description
+*  configuration for service lykConsole
+*/
 angular.module('2lykUtils')
-	.factory('lykConsole', function($log){
+ .provider('lykConsole', function LykConsoleProvider() {
 
-		var newInstance = {
-			call: call,
-			trigger: trigger,
+	 var dev = false;
 
-			log: log,
-			info: info,
-			warn: warn,
-			error: error,
-			debug: debug,
+	 this.setDev = function(value){
+		 dev = value;
+	 };
 
-			//custom
-			matrix: matrix
-		};
+	 this.dev = function(){
+		 callDev(console.debug, arguments);
+	 };
 
-		var statesFn = {
-			log: log,
-			info: info,
-			warn: warn,
-			error: error,
-			debug: debug,
-			matrix: matrix
+	 function callDev(cb, args){
+		 if(dev){
+			 Array.prototype.unshift.call(args, "[DEV]");
+			 cb.apply(cb, args);
+		 }
+	 }
+
+	 /**
+	  * @ngdoc factory
+	  * @name 2lykUtils.lykConsole
+	  * @description Service to display messages in console
+	  */
+	 this.$get = ["$log", function($log){
+
+ 		var newInstance = {
+ 			call: call,
+ 			trigger: trigger,
+
+ 			log: log,
+ 			info: info,
+ 			warn: warn,
+ 			error: error,
+ 			debug: debug,
+
+ 			//custom
+ 			matrix: matrix,
+			dev: dev
+ 		};
+
+ 		var statesFn = {
+ 			log: log,
+ 			info: info,
+ 			warn: warn,
+ 			error: error,
+ 			debug: debug,
+ 			matrix: matrix
+ 		}
+
+ 		/**
+    * @memberof 2lykUtils.lykConsole
+    * @function call
+    * @description Display message in console.
+    * @param {string} state - log, info, warn, error or debug.
+ 	 * @param {mixed} ... values
+    */
+ 		function call(){
+ 			var state = arguments[0];
+ 			if(angular.isString(state) && statesFn[state]){
+ 				Array.prototype.shift.call(arguments);
+ 			}
+ 			else{
+ 				state = "log";
+ 			}
+ 			return statesFn[state].apply(this, arguments);
+ 		}
+
+ 	/**
+    * @memberof 2lykUtils.lykConsole
+    * @function trigger
+    * @description Display message in console if a condition is true.
+    * @param {string} state - log, info, warn, error or debug.
+ 	 * @param {boolean} condition
+ 	 * @param {mixed} ... values
+ 	 * @returns {boolean} true if condition is.
+    */
+ 		function trigger(){
+ 			if(arguments.length < 2){
+ 				return;
+ 			}
+ 			var state = arguments[0];
+ 			var condition = arguments[1];
+ 			if(condition){
+ 				Array.prototype.splice.call(arguments, 1,1)
+ 				call.apply(this, arguments);
+ 				return true;
+ 			}
+ 			return false;
+ 		}
+
+ 		/**
+ 	   * @memberof 2lykUtils.lykConsole
+ 	   * @function log
+ 	   * @description Display log in console.
+ 		 * @param {mixed} ... values
+ 	   */
+ 		function log(){
+ 			//Array.prototype.push.call(arguments, "[lykConsole]");
+ 			$log.log.apply(this, arguments);
+ 		}
+
+ 		/**
+ 	   * @memberof 2lykUtils.lykConsole
+ 	   * @function info
+ 	   * @description Display info in console.
+ 		 * @param {mixed} ... values
+ 	   */
+ 		function info(){
+ 			//Array.prototype.push.call(arguments, "[lykConsole]");
+ 			$log.info.apply(this, arguments);
+ 		}
+
+ 		/**
+ 	   * @memberof 2lykUtils.lykConsole
+ 	   * @function warn
+ 	   * @description Display warning in console.
+ 		 * @param {mixed} ... values
+ 	   */
+ 		function warn(){
+ 			//Array.prototype.push.call(arguments, "[lykConsole]");
+ 			$log.warn.apply(this, arguments);
+ 		}
+
+ 		/**
+ 	   * @memberof 2lykUtils.lykConsole
+ 	   * @function error
+ 	   * @description Display error in console.
+ 		 * @param {mixed} ... values
+ 	   */
+ 		function error(){
+ 			//Array.prototype.push.call(arguments, "[lykConsole]");
+ 			$log.error.apply(this, arguments);
+ 		}
+
+ 		/**
+ 	   * @memberof 2lykUtils.lykConsole
+ 	   * @function debug
+ 	   * @description Display debug in console.
+ 		 * @param {mixed} ... values
+ 	   */
+ 		function debug(){
+ 			//Array.prototype.push.call(arguments, "[lykConsole]");
+ 			$log.debug.apply(this, arguments);
+ 		}
+
+ 		/**
+ 	   * @memberof 2lykUtils.lykConsole
+ 	   * @function matrix
+ 	   * @description (Google Chrome) Display a string in console. Arguments are stringified if there are not strings.
+ 		 * @param {string} ... values
+ 	   */
+ 		function matrix(){
+ 			//Array.prototype.push.call(arguments, "[lykConsole]");
+ 			var concatedArguments = "";
+ 			for(var i=0; i < arguments.length; i++){
+ 				if(angular.isString(arguments[i])){
+ 					concatedArguments += " " + arguments[i];
+ 					continue;
+ 				}
+ 				concatedArguments += " " + JSON.stringify(arguments[i]);
+ 			}
+ 			concatedArguments += " ";
+
+ 			$log.log.apply(this, ["%c"+concatedArguments,"background-color: black; color: #00FF00;"]);
+ 		}
+
+		function dev(){
+			callDev(debug, arguments);
 		}
 
-		/**
-   * @memberof 2lykUtils.lykConsole
-   * @function call
-   * @description Display message in console.
-   * @param {string} state - log, info, warn, error or debug.
-	 * @param {mixed} ... values
-   */
-		function call(){
-			var state = arguments[0];
-			if(angular.isString(state) && statesFn[state]){
-				Array.prototype.shift.call(arguments);
-			}
-			else{
-				state = "log";
-			}
-			return statesFn[state].apply(this, arguments);
-		}
+ 		return newInstance;
 
-	/**
-   * @memberof 2lykUtils.lykConsole
-   * @function trigger
-   * @description Display message in console if a condition is true.
-   * @param {string} state - log, info, warn, error or debug.
-	 * @param {boolean} condition
-	 * @param {mixed} ... values
-	 * @returns {boolean} true if condition is.
-   */
-		function trigger(){
-			if(arguments.length < 2){
-				return;
-			}
-			var state = arguments[0];
-			var condition = arguments[1];
-			if(condition){
-				Array.prototype.splice.call(arguments, 1,1)
-				call.apply(this, arguments);
-				return true;
-			}
-			return false;
-		}
+ }];
 
-		/**
-	   * @memberof 2lykUtils.lykConsole
-	   * @function log
-	   * @description Display log in console.
-		 * @param {mixed} ... values
-	   */
-		function log(){
-			//Array.prototype.push.call(arguments, "[lykConsole]");
-			$log.log.apply(this, arguments);
-		}
-
-		/**
-	   * @memberof 2lykUtils.lykConsole
-	   * @function info
-	   * @description Display info in console.
-		 * @param {mixed} ... values
-	   */
-		function info(){
-			//Array.prototype.push.call(arguments, "[lykConsole]");
-			$log.info.apply(this, arguments);
-		}
-
-		/**
-	   * @memberof 2lykUtils.lykConsole
-	   * @function warn
-	   * @description Display warning in console.
-		 * @param {mixed} ... values
-	   */
-		function warn(){
-			//Array.prototype.push.call(arguments, "[lykConsole]");
-			$log.warn.apply(this, arguments);
-		}
-
-		/**
-	   * @memberof 2lykUtils.lykConsole
-	   * @function error
-	   * @description Display error in console.
-		 * @param {mixed} ... values
-	   */
-		function error(){
-			//Array.prototype.push.call(arguments, "[lykConsole]");
-			$log.error.apply(this, arguments);
-		}
-
-		/**
-	   * @memberof 2lykUtils.lykConsole
-	   * @function debug
-	   * @description Display debug in console.
-		 * @param {mixed} ... values
-	   */
-		function debug(){
-			//Array.prototype.push.call(arguments, "[lykConsole]");
-			$log.debug.apply(this, arguments);
-		}
-
-		/**
-	   * @memberof 2lykUtils.lykConsole
-	   * @function matrix
-	   * @description (Google Chrome) Display a string in console. Arguments are stringified if there are not strings.
-		 * @param {string} ... values
-	   */
-		function matrix(){
-			//Array.prototype.push.call(arguments, "[lykConsole]");
-			var concatedArguments = "";
-			for(var i=0; i < arguments.length; i++){
-				if(angular.isString(arguments[i])){
-					concatedArguments += " " + arguments[i];
-					continue;
-				}
-				concatedArguments += " " + JSON.stringify(arguments[i]);
-			}
-			concatedArguments += " ";
-
-			$log.log.apply(this, ["%c"+concatedArguments,"background-color: black; color: #00FF00;"]);
-		}
-
-		return newInstance;
-
-});
+ });
 
  /**
  * @ngdoc provider

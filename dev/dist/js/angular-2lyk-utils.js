@@ -26,7 +26,7 @@ angular.module('2lykUtils')
 
 	 function callDev(cb, args){
 		 if(dev){
-			 //Array.prototype.unshift.call(args, "[DEV]");
+			 Array.prototype.unshift.call(args, "☼");
 			 cb.apply(cb, args);
 		 }
 	 }
@@ -222,13 +222,36 @@ angular.module('2lykUtils')
      */
   this.routes = function(collection) {
 		if(collection && angular.isObject(collection)){
-			__apis = collection;
-			Object.keys(__apis).forEach(
+			//__apis = collection;
+			//__apis = {};
+			Object.keys(collection).forEach(
 				function(key) {
-					if(key == "__apis") return delete __apis[key];
-					if(!angular.isObject(__apis[key])) return delete __apis[key];
-					if(!angular.isString(__apis[key]["url"])) return delete __apis[key];
-					if(!angular.isString(__apis[key]["method"])) return __apis[key]["method"] = "GET";
+					if(key == "__apis") return;
+					//if(key == "__apis") return delete object[attr];
+					function validateDocument(object, attr, prefix, depth){
+						//if(!angular.isObject(object[attr])) return delete object[attr];
+						if(!angular.isObject(object[attr])){
+							return;
+						}
+						if(depth > 3){
+							console.error("[LykXhrProvider]","Couldn't find route (max depth: 3)", {prefix: prefix, object: object, depth: depth, nextProperty: attr, nextValue: object[attr]});
+							return;
+						}
+						if(!angular.isString(object[attr]["url"])){
+							Object.keys(object[attr]).forEach(
+								function (subAttr){
+									validateDocument(object[attr], subAttr, prefix + ":" + subAttr, depth + 1);
+								}
+							);
+						}
+						else{
+							if(!angular.isString(object[attr]["method"])) object[attr]["method"] = "GET";
+							__apis[prefix] = object[attr];
+						}
+						//if(!angular.isString(object[attr]["url"])) return delete object[attr];
+						//if(!angular.isString(object[attr]["method"])) return object[attr]["method"] = "GET";
+					}
+					validateDocument(collection, key, key, 1);
 				}
 			);
 		}

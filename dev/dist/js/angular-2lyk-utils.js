@@ -618,6 +618,7 @@ angular.module('2lykUtils')
 		 * @param {object} config - add more config (see 'lykXhr.execute')
 		 * @param {object} params - replace elements in url with another value (see 'lykXhr.execute')
      * @param {string} fileName - name of the dowloaded file
+     * @return {object} promise
      */
     var download = function download(apiName, customConfig, params, fileName){
       var dfd = $q.defer();

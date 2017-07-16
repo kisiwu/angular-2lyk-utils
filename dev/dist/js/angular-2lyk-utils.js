@@ -5,6 +5,242 @@
 */
 angular.module('2lykUtils', ['ngStorage']);
 
+angular.module('2lykUtils')
+  .constant("MIME_TYPES", {
+    "audio/aac": {
+      extension: "aac",
+      description: "AAC audio file",
+    },
+    "application/x-abiword": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/octet-stream": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "video/x-msvideo": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/vnd.amazon.ebook": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/octet-stream": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/x-bzip": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/x-bzip2": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/x-csh": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "text/css": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "text/csv": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/msword": {
+      extension: "aac",
+      description: "AAC audio file",
+    },
+    "application/epub+zip": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "image/gif": {
+      extension: "gif",
+      description: "Graphics Interchange Format (GIF)",
+    },
+    "text/html": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "image/x-icon": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "text/calendar": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/java-archive": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "image/jpeg": {
+      extension: ["jpg", "jpeg"],
+      description: "AbiWord document",
+    },
+    "application/javascript": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/json": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "audio/midi": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "video/mpeg": {
+      extension: "aac",
+      description: "AAC audio file",
+    },
+    "application/vnd.apple.installer+xml": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/vnd.oasis.opendocument.presentation": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/vnd.oasis.opendocument.spreadsheet": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/vnd.oasis.opendocument.text": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "audio/ogg": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "video/ogg": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/ogg": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "image/png": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/pdf": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/vnd.ms-powerpoint": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/x-rar-compressed": {
+      extension: "aac",
+      description: "AAC audio file",
+    },
+    "application/rtf": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/x-sh": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "image/svg+xml": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/x-shockwave-flash": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/x-tar": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "image/tiff": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "font/ttf": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/vnd.visio": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "audio/x-wav": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "audio/webm": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "video/webm": {
+      extension: "aac",
+      description: "AAC audio file",
+    },
+    "image/webp": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "font/woff": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "font/woff2": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/xhtml+xml": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/vnd.ms-excel": {
+      extension: "abw",
+      description: "AbiWord document",
+    },
+    "application/xml": {
+      extension: "xml",
+      description: "XML",
+    },
+    "application/vnd.mozilla.xul+xml": {
+      extension: "xul",
+      description: "XUL",
+    },
+    "application/zip": {
+      extension: "zip",
+      description: "ZIP archive",
+    },
+    "video/3gpp": {
+      extension: "3gp",
+      description: "3GPP video container",
+    },
+    "audio/3gpp": {
+      extension: "3gp",
+      description: "3GPP audio container",
+    },
+    "video/3gpp2": {
+      extension: "3g2",
+      description: "3GPP2 video container",
+    },
+    "audio/3gpp2": {
+      extension: "3g2",
+      description: "3GPP2 audio container",
+    },
+    "application/x-7z-compressed": {
+      extension: "7z",
+      description: "7-zip archive",
+    }
+  });
+
 /**
 * @ngdoc provider
 * @name 2lykUtils.lykConsoleProvider
@@ -263,7 +499,7 @@ angular.module('2lykUtils')
 	* @description
 	*  Service to quickly make http requests
 	*/
-  this.$get = ["$q", "$http", "lykConsole", function lykXhrFactory($q, $http, lykConsole) {
+  this.$get = ["$q", "$http", "lykConsole", "MIME_TYPES", function lykXhrFactory($q, $http, lykConsole, MIME_TYPES) {
 
 		function errorHandler(){
 			Array.prototype.splice.call(arguments, 1, 0, "[lykXhr] >");
@@ -395,7 +631,13 @@ angular.module('2lykUtils')
             var blobUrl = urlCreator.createObjectURL(data);
             var downloadLink = document.createElement('a');
             downloadLink.href = blobUrl;
-            downloadLink.download = fileName && angular.isString(fileName) ? fileName : blobUrl;
+            downloadLink.download = fileName && angular.isString(fileName) ? fileName : (Math.floor(Math.random() * (99999 - 9999)) + 9999).toString();
+            if(downloadLink.download.indexOf(".") == -1 && data.type){
+              var type = MIME_TYPES[data.type];
+              if(type){
+                downloadLink.download += '.'+ (angular.isArray(type.extension) ? type.extension[0] : type.extension);
+              }
+            }
             downloadLink.style.display = 'none';
             document.body.appendChild(downloadLink);
             downloadLink.click();

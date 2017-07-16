@@ -373,6 +373,43 @@ angular.module('2lykUtils')
 			return dfd.promise;
 		}
 
+    /**
+     * @memberof 2lykUtils.lykXhr
+     * @function download
+		 * @description
+		 *   Execute a request and download the result.
+		 * @param {string} name - route name (see 'lykXhr.execute')
+		 * @param {object} config - add more config (see 'lykXhr.execute')
+		 * @param {object} params - replace elements in url with another value (see 'lykXhr.execute')
+     * @param {string} fileName - name of the dowloaded file
+     */
+    var download = function download(apiName, customConfig, params, fileName){
+      var dfd = $q.defer();
+      customConfig = (customConfig && angular.isObject(customConfig)) ? customConfig : {};
+      customConfig.responseType = 'blob';
+      execute(apiName, customConfig, params).then(
+        function(data){
+          dfd.resolve(data);
+          try{
+            var urlCreator = window.URL || window.webkitURL;
+            var blobUrl = urlCreator.createObjectURL(data);
+            var downloadLink = document.createElement('a');
+            downloadLink.href = blobUrl;
+            downloadLink.download = fileName && angular.isString(fileName) ? fileName : blobUrl;
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            downloadLink.parentNode.removeChild(downloadLink);
+          }
+          catch(e){
+            lykConsole.error(e);
+          }
+        },
+        dfd.reject
+      );
+      return dfd.promise;
+    }
+
 		/**
      * @memberof 2lykUtils.lykXhr
      * @function set
@@ -401,6 +438,7 @@ angular.module('2lykUtils')
 			set: set,
 
 			execute: execute,
+      download: download,
 
 			buildConfig: buildConfig
 		}

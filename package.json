@@ -25,10 +25,10 @@
     "karma-jasmine": "~0.1.0",
     "protractor": "^2.1.0",
     "shelljs": "^0.2.6",
-    "tmp": "0.0.23"
+    "tmp": "0.0.23",
+    "angular-screen-sensor": "../angular-screen-sensor"
   },
   "scripts": {
-    "postinstall": "bower install",
     "start": "http-server -a 0.0.0.0 -p 8888",
     "pretest": "npm install",
     "test": "node node_modules/karma/bin/karma start test/karma.conf.js",

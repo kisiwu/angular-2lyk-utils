@@ -5,6 +5,12 @@
 */
 angular.module('2lykUtils', ['ngStorage']);
 
+/**
+* @ngdoc constant
+* @name 2lykUtils.MIME_TYPES
+* @description
+*  MIME types extensions and descriptions
+*/
 angular.module('2lykUtils')
   .constant("MIME_TYPES", {
     "audio/aac": {
@@ -511,10 +517,12 @@ angular.module('2lykUtils')
 			customConfig = customConfig || {};
 			params = params || {};
 			var api = __apis[apiName];
-			var config = {
-				method: api.method,
-				url: api.url
-			};
+			var config = {};
+			Object.keys(api).forEach(
+				function(key){
+					config[key] = api[key];
+				}
+			);
 			Object.keys(params).forEach(
 				function(key){
 					var re = new RegExp( '{'+key+'}', 'g');
@@ -527,6 +535,7 @@ angular.module('2lykUtils')
 						config[key] = customConfig[key];
 				}
 			);
+
 			return config;
 		}
 

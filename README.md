@@ -8,7 +8,7 @@ A bunch of utils for AngularJS 1.6.x
 
 ## Installing
 
-- Direct download (https://github.com/kisiwu/angular-2lyk-utils/releases)
+<!--- Direct download (https://github.com/kisiwu/angular-2lyk-utils/releases)-->
 <!--- NPM (`npm install ng-tags-input --save`) -->
 - Bower (`bower install angular-2lyk-utils --save`)
 

@@ -77,12 +77,24 @@ module.exports = function(grunt) {
 
   uglify: {
     js: { //target
-        src: ['./dev/min/angular-2lyk-utils.js'],
-        dest: './dist/js/angular-2lyk-utils.min.js'
+      options: {
+        sourceMap: {
+          includeSources: true
+        }
+      },
+      files: {
+        './dist/js/angular-2lyk-utils.min.js': ['./dev/min/angular-2lyk-utils.js']
+      }
     },
     directives: { //target
-        src: ['./dev/min/angular-2lyk-directives.js'],
-        dest: './dist/js/angular-2lyk-directives.min.js'
+        options: {
+          sourceMap: {
+            includeSources: true
+          }
+        },
+        files: {
+          './dist/js/angular-2lyk-directives.min.js': ['./dev/min/angular-2lyk-directives.js']
+        }
     }
   }
 

@@ -67,11 +67,11 @@ module.exports = function(grunt) {
   concat: {
     js: { //target
         src: ['./dev/min-safe/js/*.js'],
-        dest: './dev/min/angular-2lyk-utils.js'
+        dest: './dist/js/angular-2lyk-utils.js'
     },
     directives: { //target
         src: ['./dev/min-safe/directives/*.js'],
-        dest: './dev/min/angular-2lyk-directives.js'
+        dest: './dist/js/angular-2lyk-directives.js'
     }
   },
 
@@ -83,7 +83,7 @@ module.exports = function(grunt) {
         }
       },
       files: {
-        './dist/js/angular-2lyk-utils.min.js': ['./dev/min/angular-2lyk-utils.js']
+        './dist/js/angular-2lyk-utils.min.js': ['./dist/js/angular-2lyk-utils.js']
       }
     },
     directives: { //target
@@ -93,7 +93,7 @@ module.exports = function(grunt) {
           }
         },
         files: {
-          './dist/js/angular-2lyk-directives.min.js': ['./dev/min/angular-2lyk-directives.js']
+          './dist/js/angular-2lyk-directives.min.js': ['./dist/js/angular-2lyk-directives.js']
         }
     }
   }
